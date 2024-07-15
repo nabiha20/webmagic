@@ -172,33 +172,40 @@ class PageModelExtractor {
     }
 
     private void initClassExtractors() {
-        Annotation annotation = clazz.getAnnotation(TargetUrl.class);
-        if (annotation == null) {
+        processTargetUrlAnnotation();
+        processHelpUrlAnnotation();
+        processExtractByAnnotation();
+    }
+
+    private void processTargetUrlAnnotation() {
+        TargetUrl targetUrl = (TargetUrl) clazz.getAnnotation(TargetUrl.class);
+        if (targetUrl == null) {
             targetUrlPatterns.add(Pattern.compile(".*"));
         } else {
-            TargetUrl targetUrl = (TargetUrl) annotation;
-            String[] value = targetUrl.value();
-            for (String s : value) {
-                targetUrlPatterns.add(Pattern.compile(s.replace(".", "\\.").replace("*", "[^\"'#]*")));
+            for (String value : targetUrl.value()) {
+                targetUrlPatterns.add(Pattern.compile(value.replace(".", "\\.").replace("*", "[^\"'#]*")));
             }
-            if (!targetUrl.sourceRegion().equals("")) {
+            if (!targetUrl.sourceRegion().isEmpty()) {
                 targetUrlRegionSelector = new XpathSelector(targetUrl.sourceRegion());
             }
         }
-        annotation = clazz.getAnnotation(HelpUrl.class);
-        if (annotation != null) {
-            HelpUrl helpUrl = (HelpUrl) annotation;
-            String[] value = helpUrl.value();
-            for (String s : value) {
-                helpUrlPatterns.add(Pattern.compile(s.replace(".", "\\.").replace("*", "[^\"'#]*")));
+    }
+
+    private void processHelpUrlAnnotation() {
+        HelpUrl helpUrl = (HelpUrl) clazz.getAnnotation(HelpUrl.class);
+        if (helpUrl != null) {
+            for (String value : helpUrl.value()) {
+                helpUrlPatterns.add(Pattern.compile(value.replace(".", "\\.").replace("*", "[^\"'#]*")));
             }
-            if (!helpUrl.sourceRegion().equals("")) {
+            if (!helpUrl.sourceRegion().isEmpty()) {
                 helpUrlRegionSelector = new XpathSelector(helpUrl.sourceRegion());
             }
         }
-        annotation = clazz.getAnnotation(ExtractBy.class);
-        if (annotation != null) {
-            ExtractBy extractBy = (ExtractBy) annotation;
+    }
+
+    private void processExtractByAnnotation() {
+        ExtractBy extractBy = (ExtractBy) clazz.getAnnotation(ExtractBy.class);
+        if (extractBy != null) {
             objectExtractor = new Extractor(new XpathSelector(extractBy.value()), new SelectedHtml(), extractBy.notNull(), extractBy.multi());
         }
     }

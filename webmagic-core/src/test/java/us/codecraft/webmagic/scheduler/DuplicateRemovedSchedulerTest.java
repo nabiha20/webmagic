@@ -28,6 +28,7 @@ public class DuplicateRemovedSchedulerTest {
         }
     };
 
+
     @Test
     public void test_no_duplicate_removed_for_post_request() throws Exception {
         DuplicateRemover duplicateRemover = Mockito.mock(DuplicateRemover.class);
