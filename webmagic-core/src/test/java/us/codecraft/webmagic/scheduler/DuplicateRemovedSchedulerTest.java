@@ -1,5 +1,6 @@
 package us.codecraft.webmagic.scheduler;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -28,24 +29,27 @@ public class DuplicateRemovedSchedulerTest {
         }
     };
 
+    private DuplicateRemover duplicateRemover;
+
+    @Before
+    public void setUp() {
+        duplicateRemover = Mockito.mock(DuplicateRemover.class);
+        duplicateRemovedScheduler.setDuplicateRemover(duplicateRemover);
+    }
 
     @Test
     public void test_no_duplicate_removed_for_post_request() throws Exception {
-        DuplicateRemover duplicateRemover = Mockito.mock(DuplicateRemover.class);
-        duplicateRemovedScheduler.setDuplicateRemover(duplicateRemover);
         Request request = new Request("https://www.google.com/");
         request.setMethod(HttpConstant.Method.POST);
         duplicateRemovedScheduler.push(request, null);
-        verify(duplicateRemover,times(0)).isDuplicate(any(Request.class),any(Task.class));
+        verify(duplicateRemover, times(0)).isDuplicate(any(Request.class), any(Task.class));
     }
 
     @Test
     public void test_duplicate_removed_for_get_request() throws Exception {
-        DuplicateRemover duplicateRemover = Mockito.mock(DuplicateRemover.class);
-        duplicateRemovedScheduler.setDuplicateRemover(duplicateRemover);
         Request request = new Request("https://www.google.com/");
         request.setMethod(HttpConstant.Method.GET);
         duplicateRemovedScheduler.push(request, null);
-        verify(duplicateRemover,times(1)).isDuplicate(any(Request.class),any(Task.class));
+        verify(duplicateRemover, times(1)).isDuplicate(any(Request.class), any(Task.class));
     }
 }
